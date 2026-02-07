@@ -1,0 +1,11 @@
+#!/bin/bash
+# Quick wrapper for gemini-compress.py
+# Usage: memory compress "text" | search "query" | list
+#
+# Install: 
+#   chmod +x memory
+#   sudo ln -s $(pwd)/memory /usr/local/bin/memory
+#   # Or add to PATH: export PATH="$PATH:$(pwd)"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$SCRIPT_DIR/gemini-compress.py" "$@"
