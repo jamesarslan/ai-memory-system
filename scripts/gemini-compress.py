@@ -27,7 +27,7 @@ import requests
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 COMPRESS_MODEL = "gemini-2.0-flash"  # or "gemini-1.5-flash" for older API
-EMBED_MODEL = "text-embedding-004"   # or "embedding-001"
+EMBED_MODEL = "gemini-embedding-001" # Gemini's embedding model
 
 # Default index directory - change to your preferred location
 INDEX_DIR = Path(os.environ.get("MEMORY_INDEX_DIR", Path.home() / "memory" / "index"))
