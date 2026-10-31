@@ -36,7 +36,7 @@ if [ -z "$GEMINI_API_KEY" ]; then
     echo
     echo -e "${YELLOW}⚠️  GEMINI_API_KEY not set${NC}"
     echo
-    echo "Get a free API key from: https://aistudio.google.com/app/apikey"
+    echo "Get an API key from: https://aistudio.google.com/app/apikey"
     echo
     read -p "Enter your Gemini API key (or press Enter to skip): " api_key
     

@@ -107,7 +107,7 @@ Session End
 
 Session transcripts: 10-50KB
 Compressed memory: 100-500 bytes
-Compression ratio: 20:1 to 100:1
+Compression ratio: rough word-count estimate (not measured)
 ```
 
 ### Search Flow

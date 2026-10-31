@@ -1,12 +1,18 @@
 # AI Memory System 🧠
 
-**Infinite context for AI assistants using semantic compression and retrieval.**
+**Long-term memory for AI assistants: conversation compression and semantic retrieval using the Gemini API.**
 
-Turn any AI CLI (Claude Code, Codex, Cursor, Aider, OpenClaw) into something that actually *remembers* — across sessions, topics, and time.
+Stores and searches memories that AI CLIs can use across sessions, by calling a shell command (examples: Claude Code, Codex, Cursor, Aider, OpenClaw).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![Gemini API](https://img.shields.io/badge/API-Gemini-4285F4.svg)](https://ai.google.dev/)
+
+> **Status: experimental prototype.** Interfaces and the on-disk format may change. This is a personal tool, not a production service, and it has not been security-reviewed.
+
+> **Model update required before use.** `COMPRESS_MODEL` in `scripts/gemini-compress.py` is set to `gemini-2.0-flash`. Google's [deprecations page](https://ai.google.dev/gemini-api/docs/deprecations) lists that model with a June 1, 2026 shutdown date. Change `COMPRESS_MODEL` to a currently supported Gemini model before running the tool (the deprecations page lists `gemini-3.6-flash` as the replacement).
+
+> **Privacy.** Text you compress, and every search query, is sent to Google's Gemini API. Only the stored index (JSON and embedding files) stays on your machine. The tool does not work offline.
 
 ---
 
@@ -17,7 +23,7 @@ Turn any AI CLI (Claude Code, Codex, Cursor, Aider, OpenClaw) into something tha
 git clone https://github.com/jamesarslan/ai-memory-system.git
 cd ai-memory-system
 
-# 2. Set API key (free from Google AI Studio)
+# 2. Set API key (create one in Google AI Studio)
 export GEMINI_API_KEY="your-key-here"
 
 # 3. Add to path
@@ -28,7 +34,7 @@ memory compress "We decided to use PostgreSQL instead of MySQL for the project."
 memory search "database choice"
 ```
 
-**That's it.** Your AI assistant now has persistent memory.
+**That's it.** Your AI assistant can now save and search memories.
 
 ---
 
@@ -36,7 +42,6 @@ memory search "database choice"
 
 - [The Problem](#the-problem)
 - [The Solution](#the-solution)
-- [Comparison with Other Systems](#-comparison-with-other-memory-systems)
 - [Three-Layer Memory Architecture](#-three-layer-memory-architecture)
 - [Quick Start Guide](#-quick-start-guide)
 - [Integration with AI CLIs](#-integration-with-ai-clis)
@@ -58,52 +63,33 @@ AI assistants forget everything when a conversation ends:
 ## The Solution
 
 This system provides:
-1. **Compression** — Summarize conversations into searchable memories (20:1 to 100:1 ratio)
+1. **Compression** — Summarize conversations into searchable memories. The `compression_ratio` field is a rough word-count estimate, not a measured token count.
 2. **Semantic Search** — Find relevant memories even with different wording
 3. **Structured Extraction** — Keywords, topics, decisions, and action items
-4. **Three-Layer Architecture** — Daily logs → Compressed index → Long-term knowledge
+4. **Three-Layer Convention** — Daily logs → Compressed index → Long-term knowledge (the script implements only the compressed index)
 
 ---
 
-## 🔄 Comparison with Other Memory Systems
+## 🔄 What It Does and Where Data Goes
 
-| System | Approach | Pros | Cons | Best For |
-|--------|----------|------|------|----------|
-| **This System** | Compression + Embeddings | Simple, low cost, works offline, any AI CLI | Manual triggers | CLI users, cost-conscious |
-| **MemGPT/Letta** | Hierarchical memory, self-editing | Autonomous, sophisticated | Complex setup, high token use | Research, complex agents |
-| **RAG (Retrieval)** | Vector DB + chunking | Scales to large docs | No compression, retrieval noise | Document search |
-| **LangChain Memory** | Conversation buffer/summary | Easy integration | Python-only, framework lock-in | LangChain apps |
-| **Zep** | Session memory + facts | Hosted option, auto-extract | Requires server | Production apps |
-| **Mem0** | Personal memory layer | User-centric, learns patterns | Early stage, hosted | Personal assistants |
+- **Integration:** a single Python script driven by shell commands, so it can be called from any AI CLI that can run shell commands. See [Integration with AI CLIs](#-integration-with-ai-clis).
+- **Gemini API calls:** compression uses `generateContent` and embeddings use `embedContent`. Conversation text you compress (truncated to the first 50,000 characters) and search queries are sent to Google. Nothing is processed offline.
+- **Local storage:** entries and embeddings are written as JSON files under `MEMORY_INDEX_DIR` (default `~/memory/index`).
+- **Search:** brute-force cosine similarity over all stored embedding files. This suits a personal memory store, not a large document collection.
+- **Cost and limits:** Gemini API usage is metered. See [Google's current pricing and rate limits](https://ai.google.dev/gemini-api/docs/pricing).
+- **Other memory approaches:** this project does not benchmark itself against other memory systems. Compare the tools for your own use case.
 
-### Why Choose This System?
-
-| If You Need... | Use This Because... |
-|----------------|---------------------|
-| **Any AI CLI** | Works with Claude Code, Codex, Aider, Cursor, OpenClaw, Pi |
-| **Low cost** | Gemini API is free (2M tokens/day) |
-| **Simplicity** | One Python file, no servers, no frameworks |
-| **Portability** | Plain JSON files, easy to backup/migrate |
-| **Privacy** | Runs locally, your data stays yours |
-| **Customization** | Fork and modify freely |
-
-### Key Differentiators
+### How It Works
 
 ```
-Traditional RAG:
-  Document → Chunks → Embeddings → Retrieve chunks
-  Problem: Returns raw chunks, wastes context on irrelevant parts
-
-This System:
-  Conversation → Compress → Structured JSON → Embeddings → Retrieve summaries
-  Benefit: 20-100x smaller, preserves decisions/actions, semantic search
+Conversation → generateContent (structured JSON summary) → embedContent (summary + keywords) → JSON files on disk → cosine-similarity search
 ```
 
 ---
 
 ## 🧩 Three-Layer Memory Architecture
 
-The most effective memory system uses three complementary layers:
+A practical memory setup uses three complementary layers. The script implements only Layer 2; Layers 1 and 3 are Markdown files you maintain yourself.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -230,7 +216,7 @@ Session End:
 
 ### Prerequisites
 - Python 3.8+
-- Free Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+- Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ### Installation
 
@@ -263,7 +249,7 @@ echo 'alias memory="python3 ~/ai-memory-system/scripts/gemini-compress.py"' >> ~
 
 ### Verify Installation
 ```bash
-memory --help
+memory                    # prints usage
 memory compress "Test memory: The setup is working correctly."
 memory search "setup"
 ```
@@ -386,12 +372,12 @@ memory search "docker configuration"
 # Specific topic
 memory search "authentication setup decisions"
 
-# Returns JSON-formatted results with similarity scores
+# Prints matching memories as plain text, with similarity scores
 ```
 
 ### Output Format
 
-Compression returns structured JSON:
+Each compressed memory is stored as a JSON entry in `index.json` (and in that day's file), for example:
 ```json
 {
   "id": "ctx-20260207-abc123",
@@ -412,6 +398,8 @@ Compression returns structured JSON:
   "compression_ratio": "20:1"
 }
 ```
+
+The `tokens_original`, `tokens_compressed` and `compression_ratio` fields are word-count estimates (words × 1.3), not tokenizer counts. The example values are illustrative, and the example is abridged: a stored entry also includes `source_session` and `model`. `memory compress` prints a short text summary rather than this JSON.
 
 ---
 
@@ -477,7 +465,7 @@ export MEMORY_INDEX_DIR="$HOME/.my-ai/memory"
 
 ```bash
 # Weekly: Review and consolidate
-memory list | grep "importance.*high"
+grep '"importance": "high"' ~/memory/index/index.json
 
 # Monthly: Archive old embeddings
 find ~/memory/index/embeddings -mtime +90 -exec mv {} ~/archive/memory/ \;
@@ -532,7 +520,7 @@ curl "https://generativelanguage.googleapis.com/v1beta/models?key=$GEMINI_API_KE
 ```
 
 ### Rate Limits
-- Gemini free tier: 2M tokens/day, 32k tokens/minute
+- Check your quota and rate limits in [Google's current pricing documentation](https://ai.google.dev/gemini-api/docs/pricing)
 - If hitting limits, add delay between compressions
 
 ---
@@ -551,7 +539,7 @@ PRs welcome! Areas for improvement:
 
 ## 📄 License
 
-MIT — Use freely, modify as needed.
+MIT. See [LICENSE](LICENSE) for the full text.
 
 ---
 

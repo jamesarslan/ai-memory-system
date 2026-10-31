@@ -33,12 +33,12 @@ Conversation → Gemini Flash (compress) → Structured JSON
 ```
 
 **Pros:**
-- Works with ANY AI CLI (not framework-specific)
-- Free API tier (Gemini: 2M tokens/day)
+- Works with any AI CLI that can run shell commands (not framework-specific)
+- Uses the Gemini API (metered; see Google's current pricing)
 - Simple: one Python file, no servers
-- Portable: plain JSON files
-- Privacy: runs locally
-- Excellent compression (20:1 to 100:1)
+- Portable: plain JSON files stored locally
+- Compact summaries (the compression ratio is a word-count estimate, not measured)
+- Data handling: stored index is local, but conversation text and queries are sent to Google's Gemini API; not offline
 
 **Cons:**
 - Manual trigger (not autonomous)
@@ -191,30 +191,13 @@ Conversations → Mem0 → User Memory Graph
 
 ---
 
-## Feature Comparison Table
-
-| Feature | This System | MemGPT | RAG | LangChain | Zep | Mem0 |
-|---------|-------------|--------|-----|-----------|-----|------|
-| Compression | ✅ 20-100x | ❌ | ❌ | ⚠️ Summary | ⚠️ | ⚠️ |
-| Semantic Search | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Structured Extraction | ✅ | ⚠️ | ❌ | ❌ | ✅ | ✅ |
-| Autonomous | ❌ | ✅ | ❌ | ⚠️ | ⚠️ | ✅ |
-| CLI-friendly | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| Self-hosted | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ |
-| Free tier | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
-| Multi-user | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | ✅ |
-| Setup complexity | Low | High | Medium | Medium | Medium | Low |
-
----
-
 ## When to Use What
 
 ### Use This System When:
 - ✅ You use Claude Code, Codex, Aider, Cursor, or similar CLIs
 - ✅ You want simple, portable memory
-- ✅ Cost is a concern (free Gemini API)
 - ✅ You prefer files over databases
-- ✅ You want full control and privacy
+- ✅ You want the stored index in plain local files (text is still sent to the Gemini API)
 
 ### Use MemGPT When:
 - ✅ Building complex autonomous agents
@@ -245,19 +228,6 @@ Conversations → Mem0 → User Memory Graph
 - ✅ Learning user preferences matters
 - ✅ Want hosted solution
 - ✅ Building consumer-facing product
-
----
-
-## Cost Comparison
-
-| System | API Cost | Infrastructure |
-|--------|----------|----------------|
-| This System | Free (Gemini) | None |
-| MemGPT | Model API | Moderate |
-| RAG | Embedding API | Vector DB |
-| LangChain | Model API | Varies |
-| Zep | Free/Paid tiers | Server |
-| Mem0 | Paid tiers | Hosted |
 
 ---
 

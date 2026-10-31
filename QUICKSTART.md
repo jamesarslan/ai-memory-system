@@ -4,7 +4,7 @@ Get up and running in 60 seconds.
 
 ---
 
-## 1. Get API Key (Free)
+## 1. Get API Key
 
 👉 [Google AI Studio](https://aistudio.google.com/app/apikey) — Click "Create API Key"
 

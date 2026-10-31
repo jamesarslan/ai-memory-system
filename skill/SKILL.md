@@ -5,7 +5,7 @@ description: Persistent memory system for AI assistants. Use at session start to
 
 # AI Memory Skill
 
-Provides infinite context through compression and semantic search.
+Provides long-term memory through compression and semantic search, using the Gemini API.
 
 ## Quick Commands
 
