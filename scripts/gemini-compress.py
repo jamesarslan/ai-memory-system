@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Context Compression using Gemini 3 Flash + Gemini Embeddings
-Enables infinite memory for AI assistants with semantic search capabilities.
+Context Compression using Gemini 2.0 Flash + Gemini Embeddings
+Stores long-term memory for AI assistants with semantic search capabilities.
+Note: gemini-2.0-flash is listed by Google with a June 1, 2026 shutdown date; update COMPRESS_MODEL to a current Gemini model.
 
 Requirements:
 - Python 3.8+
@@ -276,7 +277,7 @@ def main():
     """CLI interface."""
     if not GEMINI_API_KEY:
         print("Error: Set GEMINI_API_KEY environment variable", file=sys.stderr)
-        print("  Get a free key at: https://aistudio.google.com/app/apikey", file=sys.stderr)
+        print("  Get a key at: https://aistudio.google.com/app/apikey", file=sys.stderr)
         sys.exit(1)
     
     if len(sys.argv) < 2:
